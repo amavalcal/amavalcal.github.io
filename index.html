@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Denison Model Exercise</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .icon {
+      font-size: 32px;
+      cursor: grab;
+      border: 2px solid #ccc;
+      padding: 10px;
+      margin: 5px;
+      display: inline-block;
+      background-color: #f9f9f9;
+    }
+
+    .icon img {
+      width: 55px;
+      height: 55px;
+      object-fit: contain; /* keeps image from stretching */
+      }
+
+    .dropzone-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 200px;
+      height: 220px
+    }
+
+    .dropzone-title {
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .dropzone {
+      min-width: 180px;
+      width: auto;
+      min-height: 200px;
+      height: auto;
+      border: 2px dashed #666;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 5px;
+      justify-content: center;
+      align-content: flex-start;
+      background-color: #fff;
+      box-sizing: border-box;
+    }
+
+    .dropzone.correct {
+      border-color: green;
+      background-color: #e5ffe5;
+    }
+
+    .dropzone.incorrect {
+      border-color: red;
+      background-color: #ffe5e5;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 120%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 5px 8px;
+      border-radius: 5px;
+      font-size: 12px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s ease-in-out;
+      z-index: 10;
+    }
+
+    .tooltip:hover::after {
+      opacity: 1;
+    }
+
+    
+  </style>
+</head>
+<body>
+
+  <h2>Drag the icons into the correct categories</h2>
+
+  <div class="container" id="icons">
+    <!-- 🎯 12 Icons to sort (you can change emojis + categories freely!) -->
+    <div class="icon tooltip" id = "icon1" draggable="true" data-answer="adaptability" data-tooltip = "Customer Focus">  <img src="customer-focus.png" alt="Customer Focus" > </div>
+    <div class="icon tooltip" id = "icon2" draggable="true" data-answer="adaptability" data-tooltip  = "Organizational Learning"><img src="organizacion.png" alt="Organizational Learning" > </div>
+    <div class="icon tooltip" id = "icon3" draggable="true" data-answer="adaptability" data-tooltip = "Creating Change"><img src="creating-change.png" alt="Creating Change" > </div>
+    <div class="icon tooltip" id = "icon4" draggable="true" data-answer="mission" data-tooltip = "Strategic Direction & Intent"> <img src="direction.png" alt="Strategic Direction & Intent" ></div>
+    <div class="icon tooltip" id = "icon5" draggable="true" data-answer="mission" data-tooltip = "Goals & Objectives"> <img src="objetivo.png" alt="Goals & Objectives" ></div>
+    <div class="icon tooltip" id = "icon6" draggable="true" data-answer="mission" data-tooltip = "Vision"> <img src="vision.png" alt="Vision" ></div>
+    <div class="icon tooltip" id = "icon7" draggable="true" data-answer="consistency" data-tooltip = "Coordination & Integration"> <img src="integracion.png" alt="Coordination & Integration" ></div>
+    <div class="icon tooltip" id = "icon8" draggable="true" data-answer="consistency" data-tooltip = "Agreement"> <img src="acuerdo.png" alt="Agreement" ></div>
+    <div class="icon tooltip" id = "icon9" draggable="true" data-answer="consistency" data-tooltip = "Core Values"> <img src="valores.png" alt="Core Values" ></div>
+    <div class="icon tooltip" id = "icon10" draggable="true" data-answer="involvement" data-tooltip = "Capability Development"> <img src="mentalidad-de-crecimiento.png" alt="Capability Development" ></div>
+    <div class="icon tooltip" id = "icon11" draggable="true" data-answer="involvement" data-tooltip = "Team Orientation"> <img src="team-building.png" alt="Team Orientation" ></div>
+    <div class="icon tooltip" id = "icon12" draggable="true" data-answer="involvement" data-tooltip = "Empowerment"> <img src="empower.png" alt="Empowerment" ></div>
+  </div>
+
+  <div class="container" id="dropzones">
+    <!-- 🔲 Drop Zones with custom titles -->
+    <div class="dropzone-wrapper">
+      <div class="dropzone-title">Adaptability</div>
+      <div class="dropzone" id="adaptability"></div>
+    </div>
+    <div class="dropzone-wrapper">
+      <div class="dropzone-title">Mission</div>
+      <div class="dropzone" id="mission"></div>
+    </div>
+    <div class="dropzone-wrapper">
+      <div class="dropzone-title">Consistency</div>
+      <div class="dropzone" id="consistency"></div>
+    </div>
+    <div class="dropzone-wrapper">
+      <div class="dropzone-title">Involvement</div>
+      <div class="dropzone" id="involvement"></div>
+    </div>
+  </div>
+
+  <div id="exercise-content">
+    <div class="container" id="dropzones">
+    </div>
+
+  <div class="button-row">
+    <button onclick="checkAnswers()">Check Answers</button>
+    <button onclick="resetGame()">Reset</button>
+  </div>
+
+
+
+  <div id="scoreDisplay" style="font-weight: bold; margin-top: 10px;"></div>
+</div>
+
+    
+
+  <script>
+    const iconsContainer = document.getElementById("icons");
+    const originalIcons = Array.from(iconsContainer.children).map(icon => icon.cloneNode(true));
+    iconsContainer.innerHTML = ''; // Clear original icons
+
+    const shuffledIcons = [...originalIcons].sort(() => Math.random() - 0.5);
+    shuffledIcons.forEach(icon => {
+      const clone = icon.cloneNode(true);
+      makeDraggable(clone);
+      iconsContainer.appendChild(clone);
+    });
+
+    const dropzones = document.querySelectorAll(".dropzone");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+  
+    function makeDraggable(icon) {
+      icon.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("id", icon.id);
+      });
+    }
+  
+    document.querySelectorAll(".icon").forEach(makeDraggable);
+  
+    dropzones.forEach(zone => {
+      zone.addEventListener("dragover", e => e.preventDefault());
+  
+      zone.addEventListener("drop", e => {
+        e.preventDefault();
+        const id = e.dataTransfer.getData("id");
+        const icon = document.getElementById(id);
+  
+        if (icon) {
+          zone.appendChild(icon);
+        }
+      });
+    });
+  
+    function checkAnswers() {
+      let totalCorrect = 0;
+      let totalIcons = 0;
+  
+      dropzones.forEach(zone => {
+        const icons = zone.querySelectorAll(".icon");
+        let allCorrect = true;
+        icons.forEach(icon => {
+          totalIcons++;
+          if (icon.dataset.answer === zone.id) {
+            totalCorrect++;
+          } else {
+            allCorrect = false;
+          }
+        });
+        zone.classList.remove("correct", "incorrect");
+        if (icons.length > 0) {
+          zone.classList.add(allCorrect ? "correct" : "incorrect");
+        }
+      });
+  
+      scoreDisplay.textContent = `You got ${totalCorrect} out of 12 correct.`;
+    }
+  
+    function resetGame() {
+      dropzones.forEach(zone => {
+        zone.innerHTML = '';
+        zone.classList.remove("correct", "incorrect");
+      });
+  
+      iconsContainer.innerHTML = '';
+      scoreDisplay.textContent = '';
+  
+      const shuffledIcons = [...originalIcons].sort(() => Math.random() - 0.5);
+
+      shuffledIcons.forEach(icon => {
+        const clone = icon.cloneNode(true);
+        makeDraggable(clone);
+        iconsContainer.appendChild(clone);
+      });
+    }
+  </script>
+  
